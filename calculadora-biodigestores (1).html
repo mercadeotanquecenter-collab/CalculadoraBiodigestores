@@ -1,0 +1,936 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Calculadora de Biodigestores / Biodigester Calculator</title>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --green-50: #f0faf4;
+      --green-100: #d3f0df;
+      --green-600: #1e7a48;
+      --green-800: #0f4228;
+      --amber-50: #fffbeb;
+      --amber-600: #b45309;
+      --blue-50: #eff8ff;
+      --blue-600: #1d4ed8;
+      --gray-50: #f9fafb;
+      --gray-100: #f3f4f6;
+      --gray-200: #e5e7eb;
+      --gray-400: #9ca3af;
+      --gray-600: #4b5563;
+      --gray-800: #1f2937;
+      --gray-900: #111827;
+      --radius-md: 10px;
+      --radius-xl: 24px;
+    }
+
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: #f6f8f5;
+      min-height: 100vh;
+      color: var(--gray-800);
+    }
+
+    .header {
+      background: var(--green-800);
+      color: white;
+      padding: 3rem 2rem 2.5rem;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .header::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(ellipse at 20% 50%, rgba(58,170,106,0.25) 0%, transparent 60%),
+        radial-gradient(ellipse at 80% 20%, rgba(58,170,106,0.15) 0%, transparent 50%);
+    }
+
+    .header-inner {
+      position: relative;
+      z-index: 1;
+      max-width: 760px;
+      margin: 0 auto;
+    }
+
+    .logo {
+      display: block;
+      max-width: 280px;
+      max-height: 80px;
+      width: auto;
+      height: auto;
+      object-fit: contain;
+      margin: 0 auto 20px;
+    }
+
+    .header-eyebrow {
+      font-size: 11px;
+      font-weight: 500;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--green-100);
+      margin-bottom: 12px;
+    }
+
+    .header h1 {
+      font-family: 'DM Serif Display', serif;
+      font-size: clamp(2rem, 5vw, 3.5rem);
+      font-weight: 400;
+      line-height: 1.1;
+      margin-bottom: 12px;
+    }
+
+    .header p {
+      font-size: 15px;
+      color: rgba(255,255,255,0.75);
+      line-height: 1.6;
+      font-weight: 300;
+    }
+
+    .main {
+      max-width: 680px;
+      margin: 0 auto;
+      padding: 2rem 1.25rem 4rem;
+    }
+
+    .card {
+      background: white;
+      border-radius: var(--radius-xl);
+      padding: 2rem;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.06), 0 4px 16px rgba(0,0,0,0.04);
+      margin-bottom: 1.25rem;
+      animation: fadeUp 0.4s ease both;
+    }
+
+    .card:nth-child(2) { animation-delay: 0.05s; }
+    .card:nth-child(3) { animation-delay: 0.1s; }
+
+    .slider-label {
+      font-size: 12px;
+      font-weight: 500;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--gray-400);
+      margin-bottom: 1rem;
+      display: inline-block;
+    }
+
+    .slider-hero {
+      display: flex;
+      align-items: center;
+      gap: 1.5rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .slider-number {
+      font-family: 'DM Serif Display', serif;
+      font-size: 3.5rem;
+      color: var(--green-600);
+      line-height: 1;
+      min-width: 80px;
+    }
+
+    .slider-number span {
+      font-family: 'DM Sans', sans-serif;
+      font-size: 14px;
+      color: var(--gray-400);
+      font-weight: 400;
+      display: block;
+      margin-top: 4px;
+    }
+
+    .slider-track { flex: 1; }
+
+    input[type="range"] {
+      accent-color: var(--green-600);
+      width: 100%;
+      cursor: pointer;
+    }
+
+    .slider-range-labels {
+      display: flex;
+      justify-content: space-between;
+      font-size: 11px;
+      color: var(--gray-400);
+      margin-top: 6px;
+    }
+
+    .metrics {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+      margin-top: 1.5rem;
+      padding-top: 1.5rem;
+      border-top: 1px solid var(--gray-100);
+    }
+
+    .metric { text-align: center; }
+    .metric-val { font-size: 22px; font-weight: 500; color: var(--gray-900); }
+    .metric-label { font-size: 11px; color: var(--gray-400); margin-top: 2px; }
+
+    .result-header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 1.25rem;
+    }
+
+    .result-sistema {
+      font-family: 'DM Serif Display', serif;
+      font-size: 1.6rem;
+      color: var(--gray-900);
+      line-height: 1.2;
+    }
+
+    .result-tipo {
+      font-size: 13px;
+      color: var(--gray-400);
+      margin-top: 4px;
+      font-weight: 300;
+    }
+
+    .badge {
+      font-size: 11px;
+      font-weight: 500;
+      padding: 4px 12px;
+      border-radius: 20px;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+
+    .badge-green { background: var(--green-50); color: var(--green-600); }
+
+    .specs {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1px;
+      background: var(--gray-100);
+      border-radius: var(--radius-md);
+      overflow: hidden;
+      margin-bottom: 1.25rem;
+    }
+
+    .spec { background: white; padding: 14px 16px; }
+    .spec-key { font-size: 11px; color: var(--gray-400); margin-bottom: 4px; }
+    .spec-val { font-size: 15px; font-weight: 500; color: var(--gray-900); }
+
+    .bioreactor-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
+    .br-card {
+      background: var(--green-50);
+      border-radius: var(--radius-md);
+      padding: 14px 16px;
+    }
+
+    .br-label {
+      font-size: 11px;
+      color: var(--green-600);
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      margin-bottom: 4px;
+    }
+
+    .br-val {
+      font-size: 18px;
+      font-weight: 500;
+      color: var(--green-800);
+    }
+
+    .info-box {
+      border-radius: var(--radius-md);
+      padding: 14px 16px;
+      font-size: 13px;
+      line-height: 1.6;
+      margin-bottom: 1rem;
+      display: flex;
+      gap: 10px;
+      align-items: flex-start;
+    }
+
+    .info-box.blue { background: var(--blue-50); color: var(--blue-600); }
+    .info-box.amber { background: var(--amber-50); color: var(--amber-600); }
+    .info-box.green { background: var(--green-50); color: var(--green-600); }
+    .info-icon { font-size: 15px; flex-shrink: 0; margin-top: 1px; }
+    .info-text strong { display: block; font-weight: 500; margin-bottom: 2px; }
+
+    .section-title {
+      font-size: 13px;
+      font-weight: 500;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--gray-400);
+      margin-bottom: 12px;
+    }
+
+    .tips-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
+    .tip {
+      background: var(--gray-50);
+      border-radius: var(--radius-md);
+      padding: 14px 16px;
+      font-size: 13px;
+      color: var(--gray-600);
+      line-height: 1.55;
+    }
+
+    .tip-title {
+      font-weight: 500;
+      color: var(--gray-800);
+      display: block;
+      margin-bottom: 4px;
+    }
+
+    .footer {
+      text-align: center;
+      padding: 2rem;
+      font-size: 12px;
+      color: var(--gray-400);
+    }
+
+    .cta-btn {
+      display: inline-block;
+      margin-top: 6px;
+      padding: 6px 12px;
+      background: var(--green-600);
+      color: white;
+      border-radius: 999px;
+      text-decoration: none;
+      font-weight: 500;
+      transition: all 0.2s ease;
+    }
+
+    .cta-btn:hover {
+      background: var(--green-800);
+      transform: translateY(-1px);
+      box-shadow: 0 4px 10px rgba(0,0,0,0.12);
+    }
+
+    .wa-fab {
+      position: fixed;
+      right: 18px;
+      bottom: 18px;
+      width: 58px;
+      height: 58px;
+      border: none;
+      border-radius: 50%;
+      background: #25D366;
+      color: white;
+      cursor: pointer;
+      box-shadow: 0 12px 28px rgba(0,0,0,0.2);
+      z-index: 30;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .wa-panel {
+      position: fixed;
+      right: 18px;
+      bottom: 86px;
+      width: min(320px, calc(100vw - 24px));
+      background: white;
+      border-radius: 18px;
+      box-shadow: 0 16px 40px rgba(0,0,0,0.18);
+      padding: 14px;
+      z-index: 30;
+      display: none;
+    }
+
+    .wa-panel.open { display: block; }
+
+    .wa-panel-title {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--gray-900);
+      margin-bottom: 10px;
+    }
+
+    .wa-panel-subtitle {
+      font-size: 12px;
+      color: var(--gray-400);
+      margin-bottom: 12px;
+    }
+
+    .wa-list {
+      display: grid;
+      gap: 8px;
+    }
+
+    .wa-link {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      padding: 12px 14px;
+      border-radius: 14px;
+      background: var(--gray-50);
+      color: var(--gray-900);
+      text-decoration: none;
+      transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+    }
+
+    .wa-link:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+      background: var(--green-50);
+    }
+
+    .wa-branch {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--gray-900);
+    }
+
+    .wa-number {
+      font-size: 12px;
+      color: var(--gray-600);
+    }
+
+    .wa-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 11px;
+      font-weight: 700;
+      color: #25D366;
+      white-space: nowrap;
+    }
+
+    .wa-icon {
+      width: 16px;
+      height: 16px;
+      display: inline-block;
+    }
+
+    .wa-icon svg {
+      width: 100%;
+      height: 100%;
+      fill: #25D366;
+    }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation: none !important;
+        transition: none !important;
+        scroll-behavior: auto !important;
+      }
+    }
+
+    @media (max-width: 520px) {
+      .wa-fab {
+        right: 14px;
+        bottom: 14px;
+        width: 54px;
+        height: 54px;
+      }
+
+      .wa-panel {
+        right: 12px;
+        bottom: 78px;
+      }
+
+      .logo { max-width: 200px; max-height: 72px; }
+      .card { padding: 1.5rem; }
+      .metrics { grid-template-columns: 1fr 1fr; }
+      .metrics .metric:last-child { grid-column: span 2; }
+      .specs { grid-template-columns: 1fr; }
+      .bioreactor-grid { grid-template-columns: 1fr; }
+      .tips-grid { grid-template-columns: 1fr; }
+      .slider-hero { gap: 1rem; }
+      .slider-number { font-size: 2.8rem; min-width: 65px; }
+    }
+
+    /* ── Language Toggle ── */
+    .lang-toggle {
+      position: absolute;
+      top: 16px;
+      right: 20px;
+      z-index: 10;
+      display: flex;
+      align-items: center;
+      background: rgba(255,255,255,0.12);
+      border-radius: 999px;
+      padding: 3px;
+      gap: 2px;
+      backdrop-filter: blur(6px);
+    }
+    .lang-btn {
+      background: none;
+      border: none;
+      color: rgba(255,255,255,0.6);
+      font-family: 'DM Sans', sans-serif;
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 0.06em;
+      padding: 5px 12px;
+      border-radius: 999px;
+      cursor: pointer;
+      transition: background 0.2s, color 0.2s;
+    }
+    .lang-btn.active {
+      background: white;
+      color: var(--green-800);
+    }
+    .lang-btn:hover:not(.active) {
+      color: white;
+    }
+  </style>
+</head>
+<body>
+  <header class="header">
+    <div class="header-inner">
+      <img class="logo" alt="Tanker" src="data:image/png;base64,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8FUUBZqmoU+fPp4dPyhGjx6tfPzxx3I0KAjD5Sz76P4TonpnegogKisrcd9992H48OEKAPztb39TNmzYIBfDBkE6nYamaSgvL0c0GkXLli0xadKkYBTOA+7vbtWqVdxwCyCqR93PQ1VV8ccff+zS+91zzz3KsmXLkEwm66V8u4s+XzgcRnFxMYYOHepziVi2cBCRA8rKysShhx6KwsLCQMw5LigoQCKRQCQSgWEYGSMENJS5syDC/eu2XpSxwt1o9bKn071AjXpV2rdv79nxg6RXr17KBx98EKieZpZd7gxl1HP67bff4rbbbsOVV16Z0TC988475T1Lm2D6iUZQaM54OBzG2LFjceKJJzaIQIKmlyqKgtatWzeIz5xraORe0zTYtg3LsmRq1F31xBNPBGY6obscuq6jV69eKCsr42sxD3EQkQPOOOMMuXDKq4XF2+IOAraXJrA26R1ppGFb/9b9c3dOcBqh8Arti2DbNkKhEGzbRps2bXDKKac0yIqwe/fuyvLly+WfaS+BIDQa2a5xd0i49wGxbRuKosj9BQzDwJo1azB69GjceeedW92006ZNUyjtJo3g0b4E7nUU7l+zqWbWG03TUFpair/+9a9ZP3YQuPeH4ZHDYHKvXdA0TT7bduf7euihh5Qvv/xSjkbUnMrm1V4/9BmEELIzMJ1OY/r06Z4cn3mLg4gccMYZZwCATHvKssu27a16dBRFQSwWw5AhQ3wqlf/OOeccrF27FpWVlTAMA6lUKiOodTcaWXBRIyMcDsvfU6OGGt30s1AohMWLF2P//fdX/vnPf263h2DUqFFYv3693EEayGwcUceAFwvz3XWkO1XzwQcfjDFjxjTITgDWMMyePRuRSASbNm2S9zE16r1KilGzjaKqKkKhEPbaay+MHj2a7788wy3SgDvrrLPE/vvvD8C7SqChozUe9HtgS69O3759fSuX35YvX65MnDgRmzZtAlDdCHVn4vJiDw+2+yKRiEwTGYlE5MZVlPHFcRxs3LgRAPDUU0+hQ4cOOx1e/Prrr5WZM2fKaRr0KwUPdF14sRGde02AuyG1zz774IILLkCLFi24IcPy0ksvvYTffvstI5inzem87ICkHdPd66R0Xce5557rWRmYNziICLgxY8bIB34oFOLhaQ9Q77p7h2ba7bWkpARXXnllg22EPPPMM8qUKVNg2zZS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" />
+      <p class="header-eyebrow" data-i18n="eyebrow">Tratamiento de aguas residuales domésticas</p>
+      <h1 data-i18n="h1">Calculadora de Biodigestores</h1>
+      <p data-i18n="subtitle">Seleccione el número de personas para conocer el sistema de tratamiento anaeróbico recomendado.</p>
+      </div>
+    <div class="lang-toggle" role="group" aria-label="Language selector">
+      <button class="lang-btn active" id="btn-es" onclick="setLang('es')" aria-pressed="true">ES</button>
+      <button class="lang-btn" id="btn-en" onclick="setLang('en')" aria-pressed="false">EN</button>
+    </div>
+  </header>
+
+  <main class="main">
+    <div class="card">
+      <label class="slider-label" for="slider" data-i18n="sliderLabel">Número de personas</label>
+      <div class="slider-hero">
+        <div class="slider-number">
+          <span id="pval">4</span>
+          <span data-i18n="personas">personas</span>
+        </div>
+        <div class="slider-track">
+          <input type="range" min="3" max="20" value="4" step="1" id="slider" aria-describedby="slider-help">
+          <div class="slider-range-labels" id="slider-help"><span>3</span><span>20</span></div>
+        </div>
+      </div>
+
+      <div class="metrics">
+        <div class="metric">
+          <div class="metric-val" id="m-consumo">800</div>
+          <div class="metric-label" data-i18n="consumoLabel">L/día consumo</div>
+        </div>
+        <div class="metric">
+          <div class="metric-val" id="m-volumen">1,600</div>
+          <div class="metric-label" data-i18n="volumenLabel">L volumen diseño</div>
+        </div>
+        <div class="metric">
+          <div class="metric-val">2</div>
+          <div class="metric-label" data-i18n="retencionLabel">días retención</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card" aria-live="polite">
+      <div class="result-header">
+        <div>
+          <div class="result-sistema" id="r-sistema">Sistema 1570 L</div>
+          <div class="result-tipo" id="r-tipo">Integrado</div>
+        </div>
+        <span class="badge badge-green" data-i18n="badgeRecomendado">Recomendado</span>
+      </div>
+
+      <div class="specs">
+        <div class="spec">
+          <div class="spec-key" data-i18n="specModelo">Modelo del sistema</div>
+          <div class="spec-val" id="r-modelo">1570 L</div>
+        </div>
+        <div class="spec">
+          <div class="spec-key" data-i18n="specLitros">Litros de diseño</div>
+          <div class="spec-val" id="r-litros">1,600 L</div>
+        </div>
+        <div class="spec">
+          <div class="spec-key" data-i18n="specTipo">Tipo de tratamiento</div>
+          <div class="spec-val" data-i18n="valAnaerobico">Anaeróbico</div>
+        </div>
+        <div class="spec">
+          <div class="spec-key" data-i18n="specTrampa">Trampa de grasas</div>
+          <div class="spec-val" data-i18n="valTrampa">100 L (incluida)</div>
+        </div>
+      </div>
+
+      <div class="bioreactor-grid" id="bioreactor-section" style="display:none;">
+        <div class="br-card">
+          <div class="br-label" data-i18n="brLabel">Biorreactor</div>
+          <div class="br-val" id="r-biorreactor">—</div>
+        </div>
+        <div class="br-card">
+          <div class="br-label" data-i18n="bfLabel">Biofiltro</div>
+          <div class="br-val" id="r-biofiltro">—</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="info-box blue">
+      <span class="info-icon">ℹ</span>
+      <div class="info-text">
+        <strong data-i18n="infoBlue">Todos los sistemas incluyen trampa de grasas de 100 L</strong>
+      </div>
+    </div>
+
+    <div class="info-box green">
+      <span class="info-icon">ℹ</span>
+      <div class="info-text">
+        <span data-i18n="infoGreen">Para proyectos comerciales (restaurantes, hoteles, granjas avícolas o porcinas) se requiere análisis individualizado de carga orgánica, ya que la norma exige valores más altos de tratamiento.</span>
+      </div>
+    </div>
+
+    <div class="card">
+      <p class="section-title" data-i18n="tipsTitle">Recomendaciones de uso</p>
+      <div class="tips-grid">
+        <div class="tip">
+          <span class="tip-title" data-i18n="tip1Title">Separar aguas grises</span><span data-i18n="tip1Body"> Las aguas de duchas, lavamanos y cocina deben ser tratadas adecuadamente e ingresadas al sistema.</span>
+        </div>
+        <div class="tip">
+          <span class="tip-title" data-i18n="tip2Title">Trampa de grasas</span><span data-i18n="tip2Body"> Instalarla como pretratamiento es obligatorio. Omitirla reduce la eficiencia y aumenta la frecuencia de mantenimiento.</span>
+        </div>
+        <div class="tip">
+          <span class="tip-title" data-i18n="tip3Title">Productos biodegradables</span><span data-i18n="tip3Body"> Evitar cloro y antibacteriales. Estos eliminan las bacterias necesarias para el tratamiento y generan malos olores.</span>
+        </div>
+        <div class="tip">
+          <span class="tip-title" data-i18n="tip4Title">Desinfección correcta</span><span data-i18n="tip4Body"> Si necesita desinfectar, usar amonio cuaternario atomizado. Dejar secar sin enjuagar para no afectar el sistema.</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="info-box amber">
+      <span class="info-icon">⚠</span>
+      <div class="info-text">
+        <strong data-i18n="amberTitle">Uso correcto del efluente tratado</strong><span data-i18n="amberBody"> El agua tratada no debe verterse a ríos, mar ni cuerpos de agua. Aún contiene nitrógeno y fósforo que pueden dañar ecosistemas acuáticos. Usar exclusivamente para riego o infiltración al suelo.</span>
+      </div>
+    </div>
+
+  </main>
+
+  <footer class="footer">
+    <span data-i18n="footer">Calculadora para tratamiento de aguas residuales domésticas · Sistema anaeróbico · Cumple con la norma DGNTI-COPANIT 35-2019</span><br>
+    Desarrollado por <a href="https://wa.me/50764228146" target="_blank" rel="noopener noreferrer" aria-label="Contactar a AR Design por WhatsApp" class="cta-btn">AR | DESIGN</a>
+  </footer>
+
+  <div class="wa-panel" id="waPanel" aria-hidden="true">
+    <div class="wa-panel-title" data-i18n="waTitle">Contáctanos por WhatsApp</div>
+    <div class="wa-panel-subtitle" data-i18n="waSubtitle">Seleccione la sucursal más cercana.</div>
+    <div class="wa-list">
+      <a class="wa-link" href="#" data-phone="50763863251" target="_blank" rel="noopener noreferrer">
+        <div>
+          <div class="wa-branch" data-i18n="branchChorrera">Sucursal La Chorrera</div>
+          <div class="wa-number">+507 6386-3251</div>
+        </div>
+        <span class="wa-badge"><span class="wa-icon"><svg viewBox="0 0 24 24"><path d="M20.52 3.48A11.82 11.82 0 0 0 12.05 0C5.4 0 .04 5.36.04 12c0 2.12.55 4.2 1.6 6.03L0 24l6.13-1.6A11.93 11.93 0 0 0 12.05 24c6.65 0 12.01-5.36 12.01-12 0-3.2-1.25-6.2-3.54-8.52zM12.05 21.8c-1.86 0-3.67-.5-5.25-1.44l-.38-.22-3.64.95.97-3.55-.25-.36a9.77 9.77 0 0 1-1.5-5.18c0-5.41 4.4-9.8 9.82-9.8 2.62 0 5.08 1.02 6.93 2.87a9.74 9.74 0 0 1 2.88 6.93c0 5.41-4.4 9.8-9.78 9.8zm5.39-7.37c-.3-.15-1.77-.87-2.05-.97-.27-.1-.47-.15-.67.15s-.77.97-.95 1.17c-.17.2-.35.22-.65.07-.3-.15-1.27-.47-2.42-1.5-.9-.8-1.5-1.78-1.67-2.08-.17-.3-.02-.46.13-.6.13-.13.3-.35.45-.52.15-.17.2-.3.3-.5.1-.2.05-.37-.02-.52-.07-.15-.67-1.6-.92-2.2-.24-.58-.49-.5-.67-.5h-.57c-.2 0-.52.07-.8.37s-1.05 1.03-1.05 2.52 1.08 2.93 1.23 3.13c.15.2 2.12 3.24 5.13 4.54.72.31 1.28.5 1.72.64.72.23 1.37.2 1.88.12.57-.08 1.77-.72 2.02-1.42.25-.7.25-1.3.17-1.42-.07-.12-.27-.2-.57-.35z"/></svg></span>WhatsApp</span>
+      </a>
+      <a class="wa-link" href="#" data-phone="50764206814" target="_blank" rel="noopener noreferrer">
+        <div>
+          <div class="wa-branch" data-i18n="branchPanama">Sucursal Panamá</div>
+          <div class="wa-number">+507 6420-6814</div>
+        </div>
+        <span class="wa-badge"><span class="wa-icon"><svg viewBox="0 0 24 24"><path d="M20.52 3.48A11.82 11.82 0 0 0 12.05 0C5.4 0 .04 5.36.04 12c0 2.12.55 4.2 1.6 6.03L0 24l6.13-1.6A11.93 11.93 0 0 0 12.05 24c6.65 0 12.01-5.36 12.01-12 0-3.2-1.25-6.2-3.54-8.52zM12.05 21.8c-1.86 0-3.67-.5-5.25-1.44l-.38-.22-3.64.95.97-3.55-.25-.36a9.77 9.77 0 0 1-1.5-5.18c0-5.41 4.4-9.8 9.82-9.8 2.62 0 5.08 1.02 6.93 2.87a9.74 9.74 0 0 1 2.88 6.93c0 5.41-4.4 9.8-9.78 9.8zm5.39-7.37c-.3-.15-1.77-.87-2.05-.97-.27-.1-.47-.15-.67.15s-.77.97-.95 1.17c-.17.2-.35.22-.65.07-.3-.15-1.27-.47-2.42-1.5-.9-.8-1.5-1.78-1.67-2.08-.17-.3-.02-.46.13-.6.13-.13.3-.35.45-.52.15-.17.2-.3.3-.5.1-.2.05-.37-.02-.52-.07-.15-.67-1.6-.92-2.2-.24-.58-.49-.5-.67-.5h-.57c-.2 0-.52.07-.8.37s-1.05 1.03-1.05 2.52 1.08 2.93 1.23 3.13c.15.2 2.12 3.24 5.13 4.54.72.31 1.28.5 1.72.64.72.23 1.37.2 1.88.12.57-.08 1.77-.72 2.02-1.42.25-.7.25-1.3.17-1.42-.07-.12-.27-.2-.57-.35z"/></svg></span>WhatsApp</span>
+      </a>
+      <a class="wa-link" href="#" data-phone="50769234449" target="_blank" rel="noopener noreferrer">
+        <div>
+          <div class="wa-branch" data-i18n="branchSantiago">Sucursal Santiago</div>
+          <div class="wa-number">+507 6923-4449</div>
+        </div>
+        <span class="wa-badge"><span class="wa-icon"><svg viewBox="0 0 24 24"><path d="M20.52 3.48A11.82 11.82 0 0 0 12.05 0C5.4 0 .04 5.36.04 12c0 2.12.55 4.2 1.6 6.03L0 24l6.13-1.6A11.93 11.93 0 0 0 12.05 24c6.65 0 12.01-5.36 12.01-12 0-3.2-1.25-6.2-3.54-8.52zM12.05 21.8c-1.86 0-3.67-.5-5.25-1.44l-.38-.22-3.64.95.97-3.55-.25-.36a9.77 9.77 0 0 1-1.5-5.18c0-5.41 4.4-9.8 9.82-9.8 2.62 0 5.08 1.02 6.93 2.87a9.74 9.74 0 0 1 2.88 6.93c0 5.41-4.4 9.8-9.78 9.8zm5.39-7.37c-.3-.15-1.77-.87-2.05-.97-.27-.1-.47-.15-.67.15s-.77.97-.95 1.17c-.17.2-.35.22-.65.07-.3-.15-1.27-.47-2.42-1.5-.9-.8-1.5-1.78-1.67-2.08-.17-.3-.02-.46.13-.6.13-.13.3-.35.45-.52.15-.17.2-.3.3-.5.1-.2.05-.37-.02-.52-.07-.15-.67-1.6-.92-2.2-.24-.58-.49-.5-.67-.5h-.57c-.2 0-.52.07-.8.37s-1.05 1.03-1.05 2.52 1.08 2.93 1.23 3.13c.15.2 2.12 3.24 5.13 4.54.72.31 1.28.5 1.72.64.72.23 1.37.2 1.88.12.57-.08 1.77-.72 2.02-1.42.25-.7.25-1.3.17-1.42-.07-.12-.27-.2-.57-.35z"/></svg></span>WhatsApp</span>
+      </a>
+      <a class="wa-link" href="#" data-phone="50764745304" target="_blank" rel="noopener noreferrer">
+        <div>
+          <div class="wa-branch" data-i18n="branchChiriqui">Sucursal Chiriquí</div>
+          <div class="wa-number">+507 6474-5304</div>
+        </div>
+        <span class="wa-badge"><span class="wa-icon"><svg viewBox="0 0 24 24"><path d="M20.52 3.48A11.82 11.82 0 0 0 12.05 0C5.4 0 .04 5.36.04 12c0 2.12.55 4.2 1.6 6.03L0 24l6.13-1.6A11.93 11.93 0 0 0 12.05 24c6.65 0 12.01-5.36 12.01-12 0-3.2-1.25-6.2-3.54-8.52zM12.05 21.8c-1.86 0-3.67-.5-5.25-1.44l-.38-.22-3.64.95.97-3.55-.25-.36a9.77 9.77 0 0 1-1.5-5.18c0-5.41 4.4-9.8 9.82-9.8 2.62 0 5.08 1.02 6.93 2.87a9.74 9.74 0 0 1 2.88 6.93c0 5.41-4.4 9.8-9.78 9.8zm5.39-7.37c-.3-.15-1.77-.87-2.05-.97-.27-.1-.47-.15-.67.15s-.77.97-.95 1.17c-.17.2-.35.22-.65.07-.3-.15-1.27-.47-2.42-1.5-.9-.8-1.5-1.78-1.67-2.08-.17-.3-.02-.46.13-.6.13-.13.3-.35.45-.52.15-.17.2-.3.3-.5.1-.2.05-.37-.02-.52-.07-.15-.67-1.6-.92-2.2-.24-.58-.49-.5-.67-.5h-.57c-.2 0-.52.07-.8.37s-1.05 1.03-1.05 2.52 1.08 2.93 1.23 3.13c.15.2 2.12 3.24 5.13 4.54.72.31 1.28.5 1.72.64.72.23 1.37.2 1.88.12.57-.08 1.77-.72 2.02-1.42.25-.7.25-1.3.17-1.42-.07-.12-.27-.2-.57-.35z"/></svg></span>WhatsApp</span>
+      </a>
+    </div>
+  </div>
+
+  <button class="wa-fab" id="waFab" type="button" aria-label="Abrir opciones de WhatsApp">
+    <svg viewBox="0 0 24 24" width="28" height="28" aria-hidden="true">
+      <path fill="white" d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.149-.198.297-.768.967-.94 1.164-.173.198-.347.223-.644.075-.297-.149-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.372-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51l-.57-.01c-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.095 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982 1-3.648-.236-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.448 4.436-9.884 9.888-9.884 2.64.001 5.122 1.03 6.99 2.899a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.883-9.888 9.883m8.413-18.296A11.815 11.815 0 0 0 12.056 0C5.543 0 .245 5.298.242 11.812a11.77 11.77 0 0 0 1.542 5.935L0 24l6.355-1.665a11.86 11.86 0 0 0 5.698 1.45h.005c6.513 0 11.812-5.299 11.815-11.813a11.82 11.82 0 0 0-3.409-8.482"/>
+    </svg>
+  </button>
+
+  <script>
+    const tabla = [
+      { personas: 3, litros: 1200, sistema: '1270', tipo: 'Integrado', biorreactor: null, biofiltro: null },
+      { personas: 4, litros: 1600, sistema: '1570', tipo: 'Integrado', biorreactor: null, biofiltro: null },
+      { personas: 5, litros: 2000, sistema: '2170 – 2200', tipo: 'Integrado vertical u horizontal', biorreactor: null, biofiltro: null },
+      { personas: 6, litros: 2400, sistema: '2700', tipo: 'Planta horizontal', biorreactor: null, biofiltro: null },
+      { personas: 7, litros: 2800, sistema: '2700', tipo: 'Planta horizontal', biorreactor: null, biofiltro: null },
+      { personas: 8, litros: 3200, sistema: '3140 – 3750', tipo: 'Modular – Planta horizontal', biorreactor: null, biofiltro: null },
+      { personas: 9, litros: 3600, sistema: '3750', tipo: 'Planta horizontal', biorreactor: null, biofiltro: null },
+      { personas: 10, litros: 4000, sistema: '4340', tipo: 'Sistema modular con biorreactor y biofiltro', biorreactor: 2170, biofiltro: 2170 },
+      { personas: 11, litros: 4400, sistema: '4340', tipo: 'Sistema modular con biorreactor y biofiltro', biorreactor: 2170, biofiltro: 2170 },
+      { personas: 12, litros: 4800, sistema: '5400', tipo: 'Sistema modular con biorreactor y biofiltro', biorreactor: 2700, biofiltro: 2700 },
+      { personas: 13, litros: 5200, sistema: '5400', tipo: 'Sistema modular con biorreactor y biofiltro', biorreactor: 2700, biofiltro: 2700 },
+      { personas: 14, litros: 5600, sistema: '5400', tipo: 'Sistema modular con biorreactor y biofiltro', biorreactor: 2700, biofiltro: 2700 },
+      { personas: 15, litros: 6000, sistema: '5950', tipo: 'Planta con biorreactor y biofiltro', biorreactor: 3750, biofiltro: 2200 },
+      { personas: 16, litros: 6400, sistema: '6450', tipo: 'Planta con biorreactor y biofiltro', biorreactor: 3750, biofiltro: 2700 },
+      { personas: 17, litros: 6800, sistema: '7500', tipo: 'Planta con biorreactor y biofiltro', biorreactor: 3750, biofiltro: 3750 },
+      { personas: 18, litros: 7200, sistema: '7500', tipo: 'Planta con biorreactor y biofiltro', biorreactor: 3750, biofiltro: 3750 },
+      { personas: 19, litros: 7600, sistema: '7500', tipo: 'Planta con biorreactor y biofiltro', biorreactor: 3750, biofiltro: 3750 },
+      { personas: 20, litros: 8000, sistema: '7500', tipo: 'Planta con biorreactor y biofiltro', biorreactor: 3750, biofiltro: 3750 }
+    ];
+
+    const slider = document.getElementById('slider');
+    const pval = document.getElementById('pval');
+    const consumoEl = document.getElementById('m-consumo');
+    const volumenEl = document.getElementById('m-volumen');
+    const sistemaEl = document.getElementById('r-sistema');
+    const tipoEl = document.getElementById('r-tipo');
+    const modeloEl = document.getElementById('r-modelo');
+    const litrosEl = document.getElementById('r-litros');
+    const brSection = document.getElementById('bioreactor-section');
+    const biorreactorEl = document.getElementById('r-biorreactor');
+    const biofiltroEl = document.getElementById('r-biofiltro');
+    const waFab = document.getElementById('waFab');
+    const waPanel = document.getElementById('waPanel');
+    const waLinks = document.querySelectorAll('.wa-link');
+
+    function fmt(n) {
+      return n.toLocaleString('es-PA');
+    }
+
+    function calcular() {
+      const p = Number(slider.value);
+      pval.textContent = p;
+
+      const consumo = p * 200;
+      const volumen = consumo * 2;
+      consumoEl.textContent = fmt(consumo);
+      volumenEl.textContent = fmt(volumen);
+
+      const s = tabla.find((r) => r.personas === p);
+      if (!s) return;
+
+      sistemaEl.textContent = `${translations[currentLang].sistemaPrefix} ${s.sistema} L`;
+      tipoEl.textContent = s.tipo;
+      modeloEl.textContent = `${s.sistema} L`;
+      litrosEl.textContent = `${fmt(s.litros)} L`;
+
+      if (s.biorreactor && s.biofiltro) {
+        brSection.style.display = 'grid';
+        biorreactorEl.textContent = `${fmt(s.biorreactor)} L`;
+        biofiltroEl.textContent = `${fmt(s.biofiltro)} L`;
+      } else {
+        brSection.style.display = 'none';
+        biorreactorEl.textContent = '—';
+        biofiltroEl.textContent = '—';
+      }
+
+      const t = translations[currentLang];
+      const message = [
+        t.waMsg1,
+        `${t.waMsg2} ${p} ${t.waMsg3}`,
+        `${t.waMsg4} ${s.sistema} L`,
+        `${t.waMsg5} ${s.tipo}`,
+        `${t.waMsg6} ${fmt(s.litros)} L`,
+        s.biorreactor ? `${t.waMsg7} ${fmt(s.biorreactor)} L` : null,
+        s.biofiltro ? `${t.waMsg8} ${fmt(s.biofiltro)} L` : null,
+        `${t.waMsg9} ${fmt(consumo)} L`,
+        `${t.waMsg10} ${fmt(volumen)} L`,
+        '',
+        t.waMsg11
+      ].filter(Boolean).join('\n');
+
+      waLinks.forEach((link) => {
+        const phone = link.dataset.phone;
+        link.href = `https://wa.me/${phone}?text=${encodeURIComponent(message)}`;
+      });
+    }
+
+    function runChecks() {
+      console.assert(Array.isArray(tabla), 'tabla debe ser un arreglo');
+      console.assert(tabla.length === 18, 'tabla debe contener 18 registros');
+      console.assert(tabla[0].personas === 3, 'el primer registro debe iniciar en 3 personas');
+      console.assert(tabla[tabla.length - 1].personas === 20, 'el último registro debe terminar en 20 personas');
+      console.assert(document.getElementById('slider') instanceof HTMLElement, 'slider debe existir');
+      console.assert(document.querySelectorAll('.wa-link').length === 4, 'deben existir 4 enlaces de WhatsApp');
+      console.assert(typeof messagePreview(4) === 'string', 'messagePreview debe devolver un string');
+      console.assert(messagePreview(4).includes('Resultado para 4 personas:'), 'el mensaje debe incluir el resultado actual');
+    }
+
+    function messagePreview(personas) {
+      const s = tabla.find((r) => r.personas === personas);
+      if (!s) return '';
+      const consumo = personas * 200;
+      const volumen = consumo * 2;
+      return [
+        'Hola, vengo de la Calculadora de Biodigestores.',
+        `Resultado para ${personas} personas:`,
+        `• Sistema recomendado: ${s.sistema} L`,
+        `• Tipo: ${s.tipo}`,
+        `• Litros de diseño: ${fmt(s.litros)} L`,
+        s.biorreactor ? `• Biorreactor: ${fmt(s.biorreactor)} L` : null,
+        s.biofiltro ? `• Biofiltro: ${fmt(s.biofiltro)} L` : null,
+        `• Consumo estimado: ${fmt(consumo)} L/día`,
+        `• Volumen de diseño: ${fmt(volumen)} L`,
+        '',
+        'Quiero recibir asesoría sobre este sistema.'
+      ].filter(Boolean).join('\n');
+    }
+
+
+    // ── i18n ──────────────────────────────────────────────
+    const translations = {
+      es: {
+        eyebrow:         'Tratamiento de aguas residuales domésticas',
+        h1:              'Calculadora de Biodigestores',
+        subtitle:        'Seleccione el número de personas para conocer el sistema de tratamiento anaeróbico recomendado.',
+        sliderLabel:     'Número de personas',
+        personas:        'personas',
+        consumoLabel:    'L/día consumo',
+        volumenLabel:    'L volumen diseño',
+        retencionLabel:  'días retención',
+        badgeRecomendado:'Recomendado',
+        specModelo:      'Modelo del sistema',
+        specLitros:      'Litros de diseño',
+        specTipo:        'Tipo de tratamiento',
+        valAnaerobico:   'Anaeróbico',
+        specTrampa:      'Trampa de grasas',
+        valTrampa:       '100 L (incluida)',
+        brLabel:         'Biorreactor',
+        bfLabel:         'Biofiltro',
+        infoBlue:        'Todos los sistemas incluyen trampa de grasas de 100 L',
+        infoGreen:       'Para proyectos comerciales (restaurantes, hoteles, granjas avícolas o porcinas) se requiere análisis individualizado de carga orgánica, ya que la norma exige valores más altos de tratamiento.',
+        tipsTitle:       'Recomendaciones de uso',
+        tip1Title:       'Separar aguas grises',
+        tip1Body:        ' Las aguas de duchas, lavamanos y cocina deben ser tratadas adecuadamente e ingresadas al sistema.',
+        tip2Title:       'Trampa de grasas',
+        tip2Body:        ' Instalarla como pretratamiento es obligatorio. Omitirla reduce la eficiencia y aumenta la frecuencia de mantenimiento.',
+        tip3Title:       'Productos biodegradables',
+        tip3Body:        ' Evitar cloro y antibacteriales. Estos eliminan las bacterias necesarias para el tratamiento y generan malos olores.',
+        tip4Title:       'Desinfección correcta',
+        tip4Body:        ' Si necesita desinfectar, usar amonio cuaternario atomizado. Dejar secar sin enjuagar para no afectar el sistema.',
+        amberTitle:      'Uso correcto del efluente tratado',
+        amberBody:       ' El agua tratada no debe verterse a ríos, mar ni cuerpos de agua. Aún contiene nitrógeno y fósforo que pueden dañar ecosistemas acuáticos. Usar exclusivamente para riego o infiltración al suelo.',
+        footer:          'Calculadora para tratamiento de aguas residuales domésticas · Sistema anaeróbico · Cumple con la norma DGNTI-COPANIT 35-2019',
+        waTitle:         'Contáctanos por WhatsApp',
+        waSubtitle:      'Seleccione la sucursal más cercana.',
+        branchChorrera:  'Sucursal La Chorrera',
+        branchPanama:    'Sucursal Panamá',
+        branchSantiago:  'Sucursal Santiago',
+        branchChiriqui:  'Sucursal Chiriquí',
+        waMsg1:          'Hola, vengo de la Calculadora de Biodigestores.',
+        waMsg2:          'Resultado para',
+        waMsg3:          'personas:',
+        waMsg4:          '• Sistema recomendado:',
+        waMsg5:          '• Tipo:',
+        waMsg6:          '• Litros de diseño:',
+        waMsg7:          '• Biorreactor:',
+        waMsg8:          '• Biofiltro:',
+        waMsg9:          '• Consumo estimado:',
+        waMsg10:         '• Volumen de diseño:',
+        waMsg11:         'Quiero recibir asesoría sobre este sistema.',
+        sistemaPrefix:   'Sistema',
+      },
+      en: {
+        eyebrow:         'Domestic Wastewater Treatment',
+        h1:              'Biodigester Calculator',
+        subtitle:        'Select the number of people to find the recommended anaerobic treatment system.',
+        sliderLabel:     'Number of people',
+        personas:        'people',
+        consumoLabel:    'L/day consumption',
+        volumenLabel:    'L design volume',
+        retencionLabel:  'retention days',
+        badgeRecomendado:'Recommended',
+        specModelo:      'System model',
+        specLitros:      'Design liters',
+        specTipo:        'Treatment type',
+        valAnaerobico:   'Anaerobic',
+        specTrampa:      'Grease trap',
+        valTrampa:       '100 L (included)',
+        brLabel:         'Bioreactor',
+        bfLabel:         'Biofilter',
+        infoBlue:        'All systems include a 100 L grease trap',
+        infoGreen:       'Commercial projects (restaurants, hotels, poultry or pig farms) require individual organic load analysis, as regulations demand higher treatment standards.',
+        tipsTitle:       'Usage recommendations',
+        tip1Title:       'Separate grey water',
+        tip1Body:        ' Water from showers, sinks and kitchens must be properly treated and fed into the system.',
+        tip2Title:       'Grease trap',
+        tip2Body:        ' Installing it as pre-treatment is mandatory. Skipping it reduces efficiency and increases maintenance frequency.',
+        tip3Title:       'Biodegradable products',
+        tip3Body:        ' Avoid bleach and antibacterials. They kill the bacteria needed for treatment and cause bad odors.',
+        tip4Title:       'Correct disinfection',
+        tip4Body:        ' If disinfection is needed, use atomized quaternary ammonium. Let it dry without rinsing to protect the system.',
+        amberTitle:      'Correct use of treated effluent',
+        amberBody:       ' Treated water must not be discharged into rivers, sea or water bodies. It still contains nitrogen and phosphorus that can harm aquatic ecosystems. Use exclusively for irrigation or soil infiltration.',
+        footer:          'Calculator for domestic wastewater treatment · Anaerobic system · Complies with standard DGNTI-COPANIT 35-2019',
+        waTitle:         'Contact us on WhatsApp',
+        waSubtitle:      'Select the nearest branch.',
+        branchChorrera:  'La Chorrera Branch',
+        branchPanama:    'Panama Branch',
+        branchSantiago:  'Santiago Branch',
+        branchChiriqui:  'Chiriquí Branch',
+        waMsg1:          'Hello, I am coming from the Biodigester Calculator.',
+        waMsg2:          'Result for',
+        waMsg3:          'people:',
+        waMsg4:          '• Recommended system:',
+        waMsg5:          '• Type:',
+        waMsg6:          '• Design liters:',
+        waMsg7:          '• Bioreactor:',
+        waMsg8:          '• Biofilter:',
+        waMsg9:          '• Estimated consumption:',
+        waMsg10:         '• Design volume:',
+        waMsg11:         'I would like to receive advice about this system.',
+        sistemaPrefix:   'System',
+      }
+    };
+
+    let currentLang = 'es';
+
+    function setLang(lang) {
+      currentLang = lang;
+      const t = translations[lang];
+      document.documentElement.lang = lang;
+      document.querySelectorAll('[data-i18n]').forEach(el => {
+        const key = el.dataset.i18n;
+        if (t[key] !== undefined) el.textContent = t[key];
+      });
+      // Update active button
+      document.getElementById('btn-es').classList.toggle('active', lang === 'es');
+      document.getElementById('btn-en').classList.toggle('active', lang === 'en');
+      document.getElementById('btn-es').setAttribute('aria-pressed', String(lang === 'es'));
+      document.getElementById('btn-en').setAttribute('aria-pressed', String(lang === 'en'));
+      // Re-run calcular to refresh dynamic text with new language
+      calcular();
+    }
+    // ── end i18n ──────────────────────────────────────────
+    slider.addEventListener('input', calcular);
+
+    waFab.addEventListener('click', () => {
+      const isOpen = waPanel.classList.toggle('open');
+      waPanel.setAttribute('aria-hidden', String(!isOpen));
+    });
+
+    document.addEventListener('click', (event) => {
+      if (!waPanel.contains(event.target) && !waFab.contains(event.target)) {
+        waPanel.classList.remove('open');
+        waPanel.setAttribute('aria-hidden', 'true');
+      }
+    });
+
+    calcular();
+    runChecks();
+  </script>
+</body>
+</html>
